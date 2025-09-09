@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Shrinkage Calculator - Amenitiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333333;
+        }
+
+        .platform-container {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 48px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(37, 99, 235, 0.08), 0 8px 25px rgba(0, 0, 0, 0.04);
+            position: relative;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(37, 99, 235, 0.08);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: left;
+            margin-bottom: 48px;
+            animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+
+        .amenitiz-logo {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            letter-spacing: -1.5px;
+            line-height: 1;
+            transition: all 0.3s ease;
+            cursor: default;
+            display: inline-block;
+        }
+
+        .amenitiz-logo:hover {
+            transform: scale(1.01);
+        }
+
+        .header h1 {
+            color: #1f2937;
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 6px;
+            font-style: italic;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 400;
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 2px dashed #e5e7eb;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+        }
+
+        .upload-section.active {
+            border-color: #2563eb;
+            background: #f0f4ff;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 18px 36px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .status-message {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 12px;
+            display: none;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .status-message.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        .status-message.success {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-message.error {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status-message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            white-space: pre-line;
+        }
+
+        .settings-panel {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .settings-panel.show {
+            display: block;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .settings-header h3 {
+            color: #1f2937;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #374151;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background: #f8fafc;
+            border-color: #2563eb;
+        }
+
+        .settings-content {
+            display: grid;
+            gap: 20px;
+        }
+
+        .setting-group {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .setting-group h4 {
+            color: #374151;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .setting-item input {
+            width: 100px;
+            padding: 6px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        .agents-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            margin-top: 12px;
+        }
+
+        .agent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+        }
+
+        .agent-item:hover {
+            background: #f9fafb;
+        }
+
+        .agent-item:last-child {
+            border-bottom: none;
+        }
+
+        .agent-name {
+            color: #374151;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .agent-market {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .market-select {
+            padding: 4px 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .market-badge {
+            padding: 4px 12px;
+            background: #e0e7ff;
+            color: #3730a3;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab:hover {
+            color: #374151;
+        }
+
+        .tab.active {
+            color: #2563eb;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #2563eb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 32px;
+            animation: fadeIn 0.5s;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .results-header h2 {
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .export-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .export-btn.csv {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        .export-btn.csv:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .export-btn.excel {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .export-btn.excel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h3 {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .summary-card.warning {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        .summary-card.warning .value {
+            color: #d97706;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            color: #1f2937;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #374151;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inactive-agents {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .inactive-agents h3 {
+            color: #92400e;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .inactive-agents ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .inactive-agents li {
+            padding: 6px 0;
+            color: #78350f;
+            font-size: 0.95rem;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .inactive-agents li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .loader {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .footer strong {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .calculation-note {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #0369a1;
+        }
+
+        @media (max-width: 768px) {
+            .platform-container {
+                padding: 32px 24px;
+                border-radius: 24px;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .export-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .export-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="platform-container">
+        <div class="header">
+            <div class="amenitiz-logo">Amenitiz</div>
+            <h1>Weekly Shrinkage Calculator</h1>
+            <p>Care Team Workforce Management Tool</p>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls,.csv">
+            <label for="fileInput" class="file-input-label">
+                📊 Upload Weekly Timesheet
+            </label>
+            <p style="margin-top: 16px; color: #64748b; font-size: 0.95rem;">
+                Upload your weekly timesheet file (.xlsx, .xls, or .csv)
+            </p>
+            <div id="statusMessage" class="status-message"></div>
+            <div class="loader" id="loader"></div>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h3>⚙️ Settings & Agent Assignments</h3>
+                <button class="toggle-btn" onclick="toggleSettings()">Hide Settings</button>
+            </div>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('agents')">Agent Markets</button>
+                <button class="tab" onclick="switchTab('calculations')">Calculation Rules</button>
+                <button class="tab" onclick="switchTab('activities')">Activity Categories</button>
+            </div>
+            
+            <div class="tab-content active" id="agents-tab">
+                <div class="setting-group">
+                    <h4>Agent Market Assignments</h4>
+                    <div class="calculation-note">
+                        ℹ️ Each agent is counted as 1 FTE. Agents with multiple rows (sick leave + regular) are combined.
+                    </div>
+                    <div class="agents-list" id="agentsList">
+                        <!-- Agents will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="calculations-tab">
+                <div class="setting-group">
+                    <h4>Calculation Rules</h4>
+                    <div class="setting-item">
+                        <label>Contract Hours per FTE</label>
+                        <input type="number" id="contractHoursPerFTE" value="40" onchange="recalculate()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Count Training as Meeting (%)</label>
+                        <input type="number" id="trainingToMeetingPercent" value="50" onchange="recalculate()">
+                    </div>
+                    <div class="calculation-note">
+                        ℹ️ Contract hours = FTE count × Hours per FTE<br>
+                        ℹ️ Meeting hours include 50% of training hours by default
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="activities-tab">
+                <div class="setting-group">
+                    <h4>Activity Categories</h4>
+                    <div id="activityList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Activities will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="results-section"></div>
+        
+        <div class="footer">
+            <p>Powered by <strong>Amenitiz</strong> • Hospitality Technology Solutions</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        let config = {
+            contractHoursPerFTE: 40,
+            trainingToMeetingPercent: 50,
+            marketMappings: {},
+            activityCategories: {
+
+              
+                // Breaks
+                'total_break_._1295': 'breaks',
+                'total_break_brlt - lunch_2569': 'breaks',
+                'total_break_es - lunch_1336': 'breaks',
+                'total_break_fr - lunch_1332': 'breaks',
+                'total_break_global - lunch_88347': 'breaks',
+                'total_break_latam transport time_1516': 'breaks',
+                'total_break_lunch_1263': 'breaks',
+                'total_break_lunch lt_2290': 'breaks',
+                'total_break_lunch with sergi!_3770': 'breaks',
+                'total_break_paid leave - personal meeting_1491': 'breaks',
+                'total_break_performance review time_2570': 'breaks',
+                'total_break_pt - lunch_1337': 'breaks',
+                'total_break_uk - lunch_1338': 'breaks',
+                
+                // Meetings
+                'total_activity_meeting_1370': 'meetings',
+                'total_activity_meeting_1374': 'meetings',
+                
+                // Training
+                'total_activity_training - activity non productive_1353': 'training',
+                'total_activity_self training - workramp time - activity non productive_1368': 'training',
+                'total_activity_shadowing - activity non productive_2545': 'training',
+                'total_activity_intercom self training time_90265': 'training',
+                'total_activity_calendar_event': 'training',
+                
+                // Sick Leave
+                'total_activity_sick leave_2224': 'sick_leave',
+                
+                // Holidays
+                'total_activity_holiday (no-p)_3355': 'holidays',
+                
+                // Other non-productive
+                'total_activity_buddy program / emails - activity non productive_2930': 'other_non_productive',
+                'total_activity_coaching sessions initiatives - activity non-productive_90461': 'other_non_productive',
+                'total_activity_dsat - seniors activity - activity non productive_88961': 'other_non_productive',
+                'total_activity_google connection check - activity non productive_88763': 'other_non_productive',
+                'total_activity_initiative time - activity non productive_1373': 'other_non_productive',
+                'total_activity_jiras - activity seniors - activity non productive_88988': 'other_non_productive',
+                'total_activity_performance review - non productive activity_90272': 'other_non_productive',
+                'total_activity_qw real time - activity non productive_3099': 'other_non_productive',
+                'total_activity_recover extra hour - activity non productive_2242': 'other_non_productive',
+                'total_activity_retention - activity non productive_1308': 'other_non_productive',
+                'total_activity_system outage - activity non productive_3326': 'other_non_productive',
+                'total_activity_troubleshooting bug project - activity non productive_89668': 'other_non_productive',
+                'total_activity_zd queues - activity seniors - activity non productive_88989': 'other_non_productive',
+                'total_activity_commuting - activity non procuctive_91177': 'other_non_productive',
+                'total_activity_commuting - activity non procuctive_91178': 'other_non_productive',
+                'total_activity_np - qw real time_3548': 'other_non_productive',
+                'total_activity_ota connection control _88987': 'other_non_productive',
+                
+                // Productive
+                'total_activity_br calls_3556': 'productive',
+                'total_activity_brlt - chat + whatsapp_87991': 'productive',
+                'total_activity_conversations (chat - emails - tickets) - activity productive_90573': 'productive',
+                'total_activity_es - calls_1304': 'productive',
+                'total_activity_es - email_1291': 'productive',
+                'total_activity_es & uk - chat + email_3359': 'productive',
+                'total_activity_es weekend chats + email_1309': 'productive',
+                'total_activity_es/lt - outbound calls / emails_3525': 'productive',
+                'total_activity_fr - calls_1294': 'productive',
+                'total_activity_fr - email_1290': 'productive',
+                'total_activity_fr - outbound calls / emails_3554': 'productive',
+                'total_activity_fr & uk - chat + email_3460': 'productive',
+                'total_activity_fr weekend chats + emails_1264': 'productive',
+                'total_activity_global - email_87995': 'productive',
+                'total_activity_initiative time - activity productive_2484': 'productive',
+                'total_activity_it - calls_1305': 'productive',
+                'total_activity_it - email_1266': 'productive',
+                'total_activity_it - outbound calls / emails_3555': 'productive',
+                'total_activity_it & uk - chat + email_3459': 'productive',
+                'total_activity_it week end chats + emails _1310': 'productive',
+                'total_activity_latam chats_3305': 'productive',
+                'total_activity_lt emails_1289': 'productive',
+                'total_activity_pt - calls_1306': 'productive',
+                'total_activity_pt - outbound calls / emails_88497': 'productive',
+                'total_activity_pt & uk - chat + emails_1311': 'productive',
+                'total_activity_pt emails_1292': 'productive',
+                'total_activity_uk - calls_1307': 'productive',
+                'total_activity_uk - chats + emails_88742': 'productive',
+                'total_activity_uk - outbound calls / emails_1293': 'productive',
+                'total_activity_uk outbounds_91137': 'productive',
+                'total_activity_uk overflow calls _4286': 'productive',
+                'total_activity_retention _2257': 'productive',
+                'total_activity_1:1s_1265': 'productive'
+            }
+        };
+
+        let currentData = null;
+        let agentGroups = {};
+        let processedResults = null;
+
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('statusMessage').className = 'status-message';
+            document.getElementById('settingsPanel').classList.remove('show');
+
+            const fileName = file.name.toLowerCase();
+            
+            if (fileName.endsWith('.csv')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        processCSV(e.target.result);
+                    } catch (error) {
+                        showStatus('Error: ' + error.message, 'error');
+                        document.getElementById('loader').style.display = 'none';
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        processWorkbook(workbook);
+                    } catch (error) {
+                        showStatus('Error: ' + error.message, 'error');
+                        document.getElementById('loader').style.display = 'none';
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function processCSV(csvText) {
+            const parsed = Papa.parse(csvText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+            });
+
+            currentData = {
+                headers: parsed.meta.fields,
+                rows: parsed.data
+            };
+
+            extractAgentData();
+            showSettings();
+            processData();
+        }
+
+        function processWorkbook(workbook) {
+            if (!workbook.SheetNames.includes('INPUT')) {
+                showStatus('Error: No INPUT sheet found', 'error');
+                document.getElementById('loader').style.display = 'none';
+                return;
+            }
+
+            const inputSheet = workbook.Sheets['INPUT'];
+            const inputData = XLSX.utils.sheet_to_json(inputSheet, { header: 1, defval: '' });
+
+            const headers = inputData[0];
+            currentData = {
+                headers: headers,
+                rows: inputData.slice(1).map(row => {
+                    const obj = {};
+                    headers.forEach((h, i) => obj[h] = row[i]);
+                    return obj;
+                })
+            };
+
+            extractAgentData();
+            showSettings();
+            processData();
+        }
+
+        function extractAgentData() {
+            agentGroups = {};
+            
+            currentData.rows.forEach(row => {
+                const firstName = row['first_name'] || '';
+                const lastName = row['last_name'] || '';
+                if (!firstName || !lastName) return;
+                
+                const fullName = firstName.trim() + ' ' + lastName.trim();
+                
+                if (!agentGroups[fullName]) {
+                    agentGroups[fullName] = {
+                        rows: [],
+                        market: null,
+                        isActive: false
+                    };
+                }
+                
+                agentGroups[fullName].rows.push(row);
+                
+                // Check if active
+                const type = row['type'] || '';
+                const scheduledHours = parseFloat(row['total_scheduled_hours']) || 0;
+                if (type && scheduledHours > 0) {
+                    agentGroups[fullName].isActive = true;
+                }
+                
+                // Try to determine market
+                if (!agentGroups[fullName].market) {
+                    const timezone = row['surfer_timezone'] || '';
+                    const email = row['email'] || '';
+                    
+                    if (timezone.includes('Paris')) {
+                        agentGroups[fullName].market = 'FRANCE';
+                    } else if (timezone.includes('Madrid')) {
+                        agentGroups[fullName].market = 'SPAIN';
+                    } else if (timezone.includes('Rome')) {
+                        agentGroups[fullName].market = 'ITALY';
+                    } else if (timezone.includes('Lisbon')) {
+                        agentGroups[fullName].market = 'PORTUGAL';
+                    } else if (timezone.includes('London')) {
+                        agentGroups[fullName].market = 'UK';
+                    } else if (timezone.includes('America')) {
+                        agentGroups[fullName].market = 'LATAM';
+                    }
+                }
+                
+                // Apply saved config
+                if (config.marketMappings[fullName]) {
+                    agentGroups[fullName].market = config.marketMappings[fullName];
+                }
+            });
+        }
+
+        function showSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.add('show');
+            
+            // Populate agents list
+            const agentsList = document.getElementById('agentsList');
+            let html = '';
+            
+            Object.entries(agentGroups).forEach(([name, data]) => {
+                if (data.isActive) {
+                    const market = data.market || 'UNKNOWN';
+                    html += `
+                        <div class="agent-item">
+                            <span class="agent-name">${name}</span>
+                            <div class="agent-market">
+                                <select class="market-select" onchange="updateAgentMarket('${name}', this.value)">
+                                    <option value="FRANCE" ${market === 'FRANCE' ? 'selected' : ''}>France</option>
+                                    <option value="ITALY" ${market === 'ITALY' ? 'selected' : ''}>Italy</option>
+                                    <option value="PORTUGAL" ${market === 'PORTUGAL' ? 'selected' : ''}>Portugal</option>
+                                    <option value="UK" ${market === 'UK' ? 'selected' : ''}>UK</option>
+                                    <option value="SPAIN" ${market === 'SPAIN' ? 'selected' : ''}>Spain</option>
+                                    <option value="LATAM" ${market === 'LATAM' ? 'selected' : ''}>LATAM</option>
+                                    <option value="BRAZIL" ${market === 'BRAZIL' ? 'selected' : ''}>Brazil</option>
+                                    <option value="UNKNOWN" ${market === 'UNKNOWN' ? 'selected' : ''}>Unknown</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            agentsList.innerHTML = html;
+            
+            // Populate activities list
+            const activityList = document.getElementById('activityList');
+            let activityHtml = '';
+            
+            currentData.headers.forEach(header => {
+                if (header.startsWith('total_') && 
+                    !['total_scheduled_hours', 'total_activity_hours', 'total_break_hours', 'total_reported_hours'].includes(header)) {
+                    const category = config.activityCategories[header] || 'unknown';
+                    activityHtml += `
+                        <div class="setting-item">
+                            <label style="font-size: 0.85rem;">${header}</label>
+                            <select style="padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.85rem;" 
+                                    onchange="updateActivityCategory('${header}', this.value)">
+                                <option value="productive" ${category === 'productive' ? 'selected' : ''}>Productive</option>
+                                <option value="breaks" ${category === 'breaks' ? 'selected' : ''}>Breaks</option>
+                                <option value="meetings" ${category === 'meetings' ? 'selected' : ''}>Meetings</option>
+                                <option value="training" ${category === 'training' ? 'selected' : ''}>Training</option>
+                                <option value="sick_leave" ${category === 'sick_leave' ? 'selected' : ''}>Sick Leave</option>
+                                <option value="holidays" ${category === 'holidays' ? 'selected' : ''}>Holidays</option>
+                                <option value="other_non_productive" ${category === 'other_non_productive' ? 'selected' : ''}>Other Non-Productive</option>
+                            </select>
+                        </div>
+                    `;
+                }
+            });
+            
+            activityList.innerHTML = activityHtml;
+        }
+
+        function updateAgentMarket(name, market) {
+            config.marketMappings[name] = market;
+            agentGroups[name].market = market;
+            recalculate();
+        }
+
+        function updateActivityCategory(activity, category) {
+            config.activityCategories[activity] = category;
+            recalculate();
+        }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            const btn = event.target;
+            
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                btn.textContent = 'Hide Settings';
+            } else {
+                panel.style.display = 'none';
+                btn.textContent = 'Show Settings';
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function recalculate() {
+            config.contractHoursPerFTE = parseFloat(document.getElementById('contractHoursPerFTE').value) || 40;
+            config.trainingToMeetingPercent = parseFloat(document.getElementById('trainingToMeetingPercent').value) || 50;
+            
+            if (currentData) {
+                processData();
+            }
+        }
+
+        function processData() {
+            const results = {
+                marketData: {},
+                inactiveAgents: [],
+                totalScheduledHours: 0,
+                totalActivityHours: 0,
+                coherenceDifference: 0
+            };
+
+            const markets = {};
+            
+            Object.entries(agentGroups).forEach(([fullName, agentData]) => {
+                if (!agentData.isActive) {
+                    results.inactiveAgents.push({
+                        name: fullName,
+                        email: agentData.rows[0]['email'] || ''
+                    });
+                    return;
+                }
+
+                const market = agentData.market || 'UNKNOWN';
+                
+                if (!markets[market]) {
+                    markets[market] = {
+                        fteCount: 0,
+                        fteList: [],
+                        contractHours: 0,
+                        scheduledHours: 0,
+                        activityHours: 0,
+                        sickLeave: 0,
+                        holidays: 0,
+                        breaks: 0,
+                        meetings: 0,
+                        training: 0,
+                        otherNonProductive: 0,
+                        productiveHours: 0
+                    };
+                }
+                
+                markets[market].fteCount++;
+                markets[market].fteList.push(fullName);
+                
+                // Process all rows for this agent
+                agentData.rows.forEach(row => {
+                    const scheduledHours = parseFloat(row['total_scheduled_hours']) || 0;
+                    markets[market].scheduledHours += scheduledHours;
+                    results.totalScheduledHours += scheduledHours;
+                    
+                    const activityHours = parseFloat(row['total_activity_hours']) || 0;
+                    markets[market].activityHours += activityHours;
+                    results.totalActivityHours += activityHours;
+                    
+                    // Process activities
+                    currentData.headers.forEach(header => {
+                        if (header.startsWith('total_') && config.activityCategories[header]) {
+                            const value = parseFloat(row[header]) || 0;
+                            const category = config.activityCategories[header];
+                            
+                            switch(category) {
+                                case 'productive':
+                                    markets[market].productiveHours += value;
+                                    break;
+                                case 'breaks':
+                                    markets[market].breaks += value;
+                                    break;
+                                case 'meetings':
+                                    markets[market].meetings += value;
+                                    break;
+                                case 'training':
+                                    markets[market].training += value;
+                                    break;
+                                case 'sick_leave':
+                                    markets[market].sickLeave += value;
+                                    break;
+                                case 'holidays':
+                                    markets[market].holidays += value;
+                                    break;
+                                case 'other_non_productive':
+                                    markets[market].otherNonProductive += value;
+                                    break;
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Apply calculation rules
+            Object.values(markets).forEach(market => {
+                // Contract hours = FTE count × hours per FTE
+                market.contractHours = market.fteCount * config.contractHoursPerFTE;
+                
+                // Add portion of training to meetings
+                const trainingToMeeting = market.training * (config.trainingToMeetingPercent / 100);
+                market.meetings += trainingToMeeting;
+                market.training -= trainingToMeeting;
+            });
+
+            // Calculate coherence
+            const calculatedTotal = Object.values(markets).reduce((sum, m) => 
+                sum + m.productiveHours + m.breaks + m.meetings + m.training + 
+                m.sickLeave + m.holidays + m.otherNonProductive, 0);
+            
+            results.coherenceDifference = results.totalActivityHours - calculatedTotal;
+            results.marketData = markets;
+            
+            processedResults = results;
+            displayResults(results);
+            document.getElementById('loader').style.display = 'none';
+            showStatus('Data processed successfully!', 'success');
+        }
+
+        function displayResults(results) {
+            const resultsSection = document.getElementById('resultsSection');
+            
+            let html = '<div class="results-header">';
+            html += '<h2>📊 Weekly Shrinkage Report</h2>';
+            html += '<div class="export-buttons">';
+            html += '<button class="export-btn csv" onclick="exportToCSV()">📥 Export CSV</button>';
+            html += '<button class="export-btn excel" onclick="exportToExcel()">📥 Export Excel</button>';
+            html += '</div>';
+            html += '</div>';
+            
+            if (results.inactiveAgents.length > 0) {
+                html += '<div class="inactive-agents">';
+                html += '<h3>⚠️ Inactive Agents (Remove from FTE count)</h3>';
+                html += '<ul>';
+                results.inactiveAgents.forEach(agent => {
+                    html += `<li>${agent.name} (${agent.email || 'no email'})</li>`;
+                });
+                html += '</ul>';
+                html += '</div>';
+            }
+            
+            // Calculate totals
+            let totalFTE = 0, totalContract = 0, totalProductive = 0;
+            let totalSick = 0, totalHolidays = 0, totalBreaks = 0;
+            let totalMeetings = 0, totalTraining = 0, totalOther = 0;
+            
+            Object.values(results.marketData).forEach(data => {
+                totalFTE += data.fteCount;
+                totalContract += data.contractHours;
+                totalProductive += data.productiveHours;
+                totalSick += data.sickLeave;
+                totalHolidays += data.holidays;
+                totalBreaks += data.breaks;
+                totalMeetings += data.meetings;
+                totalTraining += data.training;
+                totalOther += data.otherNonProductive;
+            });
+            
+            // Summary cards
+            html += '<div class="summary-cards">';
+            html += `<div class="summary-card"><h3>Total FTEs</h3><div class="value">${totalFTE}</div></div>`;
+            html += `<div class="summary-card"><h3>Contract Hours</h3><div class="value">${totalContract.toFixed(1)}</div></div>`;
+            html += `<div class="summary-card"><h3>Scheduled Hours</h3><div class="value">${results.totalScheduledHours.toFixed(1)}</div></div>`;
+            html += `<div class="summary-card"><h3>Productive Hours</h3><div class="value">${totalProductive.toFixed(1)}</div></div>`;
+            
+            if (Math.abs(results.coherenceDifference) > 0.1) {
+                html += `<div class="summary-card warning"><h3>Coherence Diff</h3><div class="value">${results.coherenceDifference > 0 ? '+' : ''}${results.coherenceDifference.toFixed(1)}h</div></div>`;
+            }
+            html += '</div>';
+            
+            // Overall summary
+            html += '<div class="data-table">';
+            html += '<div class="table-header"><h3>Overall Summary</h3></div>';
+            html += '<table>';
+            html += '<tr><th>Metric</th><th>Hours</th></tr>';
+            html += `<tr><td>FTE's</td><td>${totalFTE}</td></tr>`;
+            html += `<tr><td>Contract hours (${config.contractHoursPerFTE}h × ${totalFTE} FTE)</td><td>${totalContract.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Total scheduled hours</td><td>${results.totalScheduledHours.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Sick leaves</td><td>${totalSick.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Holidays</td><td>${totalHolidays.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Training (after ${config.trainingToMeetingPercent}% to meetings)</td><td>${totalTraining.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Meetings (includes ${config.trainingToMeetingPercent}% of training)</td><td>${totalMeetings.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Breaks</td><td>${totalBreaks.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Other non-productive</td><td>${totalOther.toFixed(1)}</td></tr>`;
+            html += `<tr><td>Productive hours</td><td>${totalProductive.toFixed(1)}</td></tr>`;
+            
+            const workingHours = totalContract - totalSick - totalHolidays;
+            html += `<tr><td>Working hours</td><td>${workingHours.toFixed(1)}</td></tr>`;
+            html += `<tr><td>% of total hours</td><td>${((workingHours / totalContract) * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td>% Shrinkage</td><td>${(((totalContract - totalProductive) / totalContract) * 100).toFixed(1)}%</td></tr>`;
+            
+            if (Math.abs(results.coherenceDifference) > 0.1) {
+                html += `<tr style="background: #fef3c7;"><td style="color: #92400e; font-weight: 600;">Coherence difference</td><td style="color: #92400e; font-weight: 600;">${results.coherenceDifference.toFixed(1)}h</td></tr>`;
+            }
+            html += '</table>';
+            html += '</div>';
+            
+            // Market breakdown
+            Object.entries(results.marketData).forEach(([market, data]) => {
+                if (data.fteCount === 0) return;
+                
+                html += '<div class="data-table">';
+                html += `<div class="table-header">
+                    <h3>${market}</h3>
+                    <span class="table-info">${data.fteCount} FTEs</span>
+                </div>`;
+                html += '<table>';
+                html += '<tr><th>Metric</th><th>Value</th></tr>';
+                html += `<tr><td>FTE's</td><td>${data.fteCount}</td></tr>`;
+                html += `<tr><td>Contract hours</td><td>${data.contractHours.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Scheduled hours</td><td>${data.scheduledHours.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Sick leaves</td><td>${data.sickLeave.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Holidays</td><td>${data.holidays.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Training</td><td>${data.training.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Meetings</td><td>${data.meetings.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Breaks</td><td>${data.breaks.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Other non-productive</td><td>${data.otherNonProductive.toFixed(1)}</td></tr>`;
+                html += `<tr><td>Productive hours</td><td>${data.productiveHours.toFixed(1)}</td></tr>`;
+                
+                const marketWorking = data.contractHours - data.sickLeave - data.holidays;
+                html += `<tr><td>Working hours</td><td>${marketWorking.toFixed(1)}</td></tr>`;
+                html += `<tr><td>% of total hours</td><td>${((marketWorking / data.contractHours) * 100).toFixed(1)}%</td></tr>`;
+                html += `<tr><td>% Shrinkage</td><td>${(((data.contractHours - data.productiveHours) / data.contractHours) * 100).toFixed(1)}%</td></tr>`;
+                html += '</table>';
+                
+                // Show agents in this market
+                html += `<details style="margin: 12px; cursor: pointer;">
+                    <summary style="color: #64748b; font-size: 0.9rem;">View agents (${data.fteList.length})</summary>
+                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px; margin-top: 8px;">`;
+                data.fteList.forEach(agent => {
+                    html += `<div style="padding: 4px 0; color: #374151; font-size: 0.85rem;">• ${agent}</div>`;
+                });
+                html += '</div></details>';
+                html += '</div>';
+            });
+            
+            resultsSection.innerHTML = html;
+            resultsSection.style.display = 'block';
+        }
+
+        function exportToCSV() {
+            if (!processedResults) return;
+            
+            const results = processedResults;
+            const csvData = [];
+            
+            csvData.push(['Weekly Shrinkage Report']);
+            csvData.push(['Generated', new Date().toISOString()]);
+            csvData.push([]);
+            csvData.push(['Metric', 'Overall', ...Object.keys(results.marketData)]);
+            
+            let totals = {
+                fte: 0, contract: 0, scheduled: 0, sick: 0, holidays: 0,
+                breaks: 0, meetings: 0, training: 0, other: 0, productive: 0
+            };
+            
+            Object.values(results.marketData).forEach(data => {
+                totals.fte += data.fteCount;
+                totals.contract += data.contractHours;
+                totals.scheduled += data.scheduledHours;
+                totals.sick += data.sickLeave;
+                totals.holidays += data.holidays;
+                totals.breaks += data.breaks;
+                totals.meetings += data.meetings;
+                totals.training += data.training;
+                totals.other += data.otherNonProductive;
+                totals.productive += data.productiveHours;
+            });
+            
+            csvData.push(['FTE\'s', totals.fte, ...Object.values(results.marketData).map(d => d.fteCount)]);
+            csvData.push(['Contract hours', totals.contract.toFixed(1), ...Object.values(results.marketData).map(d => d.contractHours.toFixed(1))]);
+            csvData.push(['Scheduled hours', results.totalScheduledHours.toFixed(1), ...Object.values(results.marketData).map(d => d.scheduledHours.toFixed(1))]);
+            csvData.push(['Sick leaves', totals.sick.toFixed(1), ...Object.values(results.marketData).map(d => d.sickLeave.toFixed(1))]);
+            csvData.push(['Holidays', totals.holidays.toFixed(1), ...Object.values(results.marketData).map(d => d.holidays.toFixed(1))]);
+            csvData.push(['Training', totals.training.toFixed(1), ...Object.values(results.marketData).map(d => d.training.toFixed(1))]);
+            csvData.push(['Meetings', totals.meetings.toFixed(1), ...Object.values(results.marketData).map(d => d.meetings.toFixed(1))]);
+            csvData.push(['Breaks', totals.breaks.toFixed(1), ...Object.values(results.marketData).map(d => d.breaks.toFixed(1))]);
+            csvData.push(['Other non-productive', totals.other.toFixed(1), ...Object.values(results.marketData).map(d => d.otherNonProductive.toFixed(1))]);
+            csvData.push(['Productive hours', totals.productive.toFixed(1), ...Object.values(results.marketData).map(d => d.productiveHours.toFixed(1))]);
+            
+            const workingHours = totals.contract - totals.sick - totals.holidays;
+            csvData.push(['Working hours', workingHours.toFixed(1), ...Object.values(results.marketData).map(d => (d.contractHours - d.sickLeave - d.holidays).toFixed(1))]);
+            csvData.push(['% of total hours', (workingHours / totals.contract * 100).toFixed(1) + '%', ...Object.values(results.marketData).map(d => ((d.contractHours - d.sickLeave - d.holidays) / d.contractHours * 100).toFixed(1) + '%')]);
+            csvData.push(['% Shrinkage', ((totals.contract - totals.productive) / totals.contract * 100).toFixed(1) + '%', ...Object.values(results.marketData).map(d => ((d.contractHours - d.productiveHours) / d.contractHours * 100).toFixed(1) + '%')]);
+            
+            if (Math.abs(results.coherenceDifference) > 0.1) {
+                csvData.push(['Coherence difference', results.coherenceDifference.toFixed(1)]);
+            }
+            
+            const csv = Papa.unparse(csvData);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'shrinkage_report_' + new Date().toISOString().slice(0, 10) + '.csv';
+            link.click();
+            
+            showStatus('CSV exported successfully!', 'success');
+        }
+
+        function exportToExcel() {
+            // Similar to CSV but in Excel format
+            if (!processedResults) return;
+            
+            const wb = XLSX.utils.book_new();
+            const wsData = [];
+            
+            // Add same data structure as CSV
+            wsData.push(['Metric', 'Value']);
+            
+            let totals = {
+                fte: 0, contract: 0, sick: 0, holidays: 0,
+                breaks: 0, meetings: 0, training: 0, other: 0, productive: 0
+            };
+            
+            Object.values(processedResults.marketData).forEach(data => {
+                totals.fte += data.fteCount;
+                totals.contract += data.contractHours;
+                totals.sick += data.sickLeave;
+                totals.holidays += data.holidays;
+                totals.breaks += data.breaks;
+                totals.meetings += data.meetings;
+                totals.training += data.training;
+                totals.other += data.otherNonProductive;
+                totals.productive += data.productiveHours;
+            });
+            
+            wsData.push(['FTE\'s', totals.fte]);
+            wsData.push(['Contract hours', totals.contract.toFixed(1)]);
+            wsData.push(['Hirings', '']);
+            wsData.push(['Attrition', '']);
+            wsData.push(['Sick leaves', totals.sick.toFixed(1)]);
+            wsData.push(['Holidays', totals.holidays.toFixed(1)]);
+            wsData.push(['Working hours', (totals.contract - totals.sick - totals.holidays).toFixed(1)]);
+            wsData.push(['% of total hours', ((totals.contract - totals.sick - totals.holidays) / totals.contract * 100).toFixed(1) + '%']);
+            wsData.push(['Training', totals.training.toFixed(1)]);
+            wsData.push(['Meetings', totals.meetings.toFixed(1)]);
+            wsData.push(['Breaks', totals.breaks.toFixed(1)]);
+            wsData.push(['Other non-productive time', totals.other.toFixed(1)]);
+            wsData.push(['Productive hours', totals.productive.toFixed(1)]);
+            wsData.push(['% of total hours', (totals.productive / totals.contract * 100).toFixed(1) + '%']);
+            wsData.push(['% Shrinkage', ((totals.contract - totals.productive) / totals.contract * 100).toFixed(1) + '%']);
+            
+            // Add market breakdowns
+            Object.entries(processedResults.marketData).forEach(([market, data]) => {
+                wsData.push([]);
+                wsData.push([market]);
+                wsData.push(['FTE\'s', data.fteCount]);
+                wsData.push(['Contract hours', data.contractHours.toFixed(1)]);
+                wsData.push(['Sick leaves', data.sickLeave.toFixed(1)]);
+                wsData.push(['Holidays', data.holidays.toFixed(1)]);
+                wsData.push(['Training', data.training.toFixed(1)]);
+                wsData.push(['Meetings', data.meetings.toFixed(1)]);
+                wsData.push(['Breaks', data.breaks.toFixed(1)]);
+                wsData.push(['Other non-productive', data.otherNonProductive.toFixed(1)]);
+                wsData.push(['Productive hours', data.productiveHours.toFixed(1)]);
+                wsData.push(['Working hours', (data.contractHours - data.sickLeave - data.holidays).toFixed(1)]);
+                wsData.push(['% of total hours', ((data.contractHours - data.sickLeave - data.holidays) / data.contractHours * 100).toFixed(1) + '%']);
+                wsData.push(['% Shrinkage', ((data.contractHours - data.productiveHours) / data.contractHours * 100).toFixed(1) + '%']);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Shrinkage Report');
+            XLSX.writeFile(wb, 'shrinkage_report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+            
+            showStatus('Excel exported successfully!', 'success');
+        }
+
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message show ' + type;
+            
+            if (type !== 'warning') {
+                setTimeout(() => {
+                    statusElement.classList.remove('show');
+                }, 4000);
+            }
+        }
+    </script>
+</body>
+</html>
